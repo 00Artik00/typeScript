@@ -4,8 +4,12 @@ import { renderUserBlock } from './user.js'
 import { renderToast } from './lib.js'
 
 window.addEventListener('DOMContentLoaded', () => {
-  renderUserBlock('0')
-  renderSearchFormBlock()
+  const date = new Date();
+  const dateIn = date.toISOString().split("T")[0];
+  const dateOut = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3, 0)
+    .toISOString().split('T')[0];
+  renderUserBlock(3, 'Tim Berton', '/img/avatar.png')
+  renderSearchFormBlock(dateIn, dateOut)
   renderSearchStubBlock()
   renderToast(
     { text: 'Это пример уведомления. Используйте его при необходимости', type: 'success' },
