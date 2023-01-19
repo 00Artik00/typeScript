@@ -1,4 +1,6 @@
 import { renderBlock } from './lib.js'
+import { SearchFormData, Place } from './interfases.js'
+import { json } from 'stream/consumers';
 
 export function renderSearchFormBlock(dateIn: string, dateOut: string) {
   const date = new Date();
@@ -35,11 +37,34 @@ export function renderSearchFormBlock(dateIn: string, dateOut: string) {
             <input id="max-price" type="text" value="" name="price" class="max-price" />
           </div>
           <div>
-            <div><button>Найти</button></div>
+            <div><button class="search-button">Найти</button></div>
           </div>
         </div>
       </fieldset>
     </form>
     `
   )
+
+}
+export function searchHandler(event: Event): void {
+  event.preventDefault();
+  const formData: SearchFormData = {
+    inputIn: (<HTMLInputElement>document.querySelector("#check-in-date")).value,
+    inputOut: (<HTMLInputElement>document.querySelector("#check-out-date")).value,
+    inputMaxPrice: +(<HTMLInputElement>document.querySelector("#max-price")).value
+  }
+  search(formData, searchCallBack);
+}
+export function search(formData: SearchFormData, cl?: (search: Error | []) => void): void {
+  console.log(JSON.stringify(formData));
+  if (cl) cl(new Error);
+}
+function searchCallBack(search: Error | []) {
+  setTimeout(() => {
+    if (Math.round(Math.random())) {
+      console.log(`RANDOM VALUE: ${JSON.stringify([])}`)
+    } else {
+      console.log(`RANDOM VALUE: ${search}`)
+    }
+  }, 2000)
 }

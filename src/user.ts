@@ -1,8 +1,10 @@
 import { renderBlock } from './lib.js'
 
 export function renderUserBlock(favoriteItemsAmount: number, userName: string, userAvatarLink: string) {
-  const favoritesCaption = favoriteItemsAmount ? favoriteItemsAmount : 'ничего нет'
-  const hasFavoriteItems = favoriteItemsAmount ? true : false
+  const favoritesCaption = favoriteItemsAmount ? favoriteItemsAmount : 'ничего нет';
+  const hasFavoriteItems = favoriteItemsAmount ? true : false;
+  getUserData();
+  getFavoritesAmount();
 
   renderBlock(
     'user-block',
@@ -18,4 +20,20 @@ export function renderUserBlock(favoriteItemsAmount: number, userName: string, u
     </div>
     `
   )
+}
+function getUserData(): unknown {
+  if (localStorage.getItem('user') == null) {
+    return "ничего не найдено"
+  } else {
+    return JSON.parse(localStorage.getItem('user'))
+  }
+
+}
+function getFavoritesAmount(): unknown {
+  if (localStorage.getItem('favoritesAmount') == null) {
+    return "ничего не найдено";
+  } else {
+    return +localStorage.getItem('favoritesAmount');
+  }
+
 }
