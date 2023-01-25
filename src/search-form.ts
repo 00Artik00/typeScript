@@ -1,8 +1,18 @@
 import { renderBlock } from './lib.js'
-import { SearchFormData, Place } from './interfases.js'
-import { json } from 'stream/consumers';
+import { SearchFormData, Estates } from './interfases.js'
+import { renderEmptyOrErrorSearchBlock, renderSearchResultsBlock } from './search-results.js'
 
-export function renderSearchFormBlock(dateIn: string, dateOut: string) {
+function searchCallBack(search: Error | []): void {
+  setTimeout(() => {
+    if (Math.round(Math.random())) {
+      console.log(`RANDOM VALUE: ${JSON.stringify([])}`)
+    } else {
+      console.log(`RANDOM VALUE: ${search}`)
+    }
+  }, 2000)
+}
+
+export function renderSearchFormBlock(dateIn: string, dateOut: string): void {
   const date = new Date();
   const currentDate = date.toISOString().split("T")[0];
   const lastDayNextMonth = new Date(date.getFullYear(), date.getMonth() + 2, 1)
@@ -49,22 +59,32 @@ export function renderSearchFormBlock(dateIn: string, dateOut: string) {
 export function searchHandler(event: Event): void {
   event.preventDefault();
   const formData: SearchFormData = {
+    inputCity: (<HTMLInputElement>document.querySelector("#city")).value,
     inputIn: (<HTMLInputElement>document.querySelector("#check-in-date")).value,
     inputOut: (<HTMLInputElement>document.querySelector("#check-out-date")).value,
     inputMaxPrice: +(<HTMLInputElement>document.querySelector("#max-price")).value
   }
   search(formData, searchCallBack);
 }
-export function search(formData: SearchFormData, cl?: (search: Error | []) => void): void {
-  console.log(JSON.stringify(formData));
-  if (cl) cl(new Error);
-}
-function searchCallBack(search: Error | []) {
-  setTimeout(() => {
-    if (Math.round(Math.random())) {
-      console.log(`RANDOM VALUE: ${JSON.stringify([])}`)
-    } else {
-      console.log(`RANDOM VALUE: ${search}`)
+export async function search(formData: SearchFormData, cl?: (search: Error | []) => void): Promise<void> {
+  let response = await fetch("/estates", {
+    method: 'POST',
+    body: JSON.stringify(formData),
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8'
+    },
+  });
+  if (response.ok) {
+    let results: Estates[] = await response.json();
+    if (results.length > 0) {
+      renderSearchResultsBlock(results);
+      return;
     }
-  }, 2000)
+    renderEmptyOrErrorSearchBlock(`По вашим запросам ничего не найдено, попробуйте изменить дату заезда/выезда или максимальную цену за сутки`);
+
+
+  } else {
+    alert("Ошибка HTTP: " + response.status);
+  }
 }
+

@@ -3,5 +3,4 @@ export function initHandlers() {
     document.querySelector('.search-button')?.addEventListener('click', event => {
         searchHandler(event);
     })
-
 }

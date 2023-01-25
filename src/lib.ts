@@ -1,9 +1,9 @@
-export function renderBlock(elementId, html) {
+import { Message, Action } from "./interfases"
+export function renderBlock(elementId: string, html: string): void {
   const element = document.getElementById(elementId)
   element.innerHTML = html
 }
-
-export function renderToast(message, action) {
+export function renderToast(message: Message, action: Action): void {
   let messageText = ''
 
   if (message != null) {
@@ -20,7 +20,7 @@ export function renderToast(message, action) {
     messageText
   )
 
-  const button = document.getElementById('toast-main-action')
+  const button: HTMLButtonElement = document.querySelector('#toast-main-action')
   if (button != null) {
     button.onclick = function () {
       if (action != null && action.handler != null) {
@@ -29,4 +29,8 @@ export function renderToast(message, action) {
       renderToast(null, null)
     }
   }
+}
+export function updateBlock(querySelec: string, text: string): void {
+  const element = document.querySelector(querySelec)
+  element.innerHTML = text
 }

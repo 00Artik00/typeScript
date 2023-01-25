@@ -1,6 +1,61 @@
-import { renderBlock } from './lib.js'
-
-export function renderSearchStubBlock () {
+import { Estates, Favorites } from './interfases.js';
+import { renderBlock, updateBlock } from './lib.js';
+import { getFavoritesAmount } from './user.js'
+function getResultsToRender(results: Estates[]): string {
+  let resultsToRender = '';
+  results.forEach(result => {
+    resultsToRender += `
+      <li class="result">
+      <div class="result-container">
+          <div class="result-img-container">
+              <div class="favorites" data-id=${result.id}> </div>
+              <img class="result-img" src=${result.img} alt=${result.imgAlt}>
+          </div>
+          <div class="result-info">
+              <div class="result-info--header">
+                  <p>${result.name} </p>
+                  <p class="price">${result.price}&#8381; </p>
+              </div>
+              <div class="result-info--map"> <i class="map-icon"> </i>${result.distanse}</div>
+              <div class="result-info--descr"> ${result.describe} </div>
+              <div class="result-info--footer">
+                  <div>
+                      <button>Забронировать</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </li>
+    `
+  });
+  return resultsToRender;
+}
+function FavoriteHandler(favoritesElems: NodeListOf<HTMLDivElement>, results: Estates[]) {
+  favoritesElems.forEach(favorite => {
+    favorite.addEventListener('click', (event) => {
+      //Обработчик для отмены избранного
+      if (favorite.classList.contains('active')) {
+        const favorites: Favorites[] = JSON.parse(localStorage.getItem('favoriteItems'));
+        favorites.splice(favorites.indexOf(favorites.find(el => el.id == favorite.dataset.id)), 1);
+        localStorage.setItem('favoriteItems', JSON.stringify(favorites))
+        localStorage.setItem('favoritesAmount', `${+localStorage.getItem('favoritesAmount') - 1}`)
+        //Обработчик для добавления избранного
+      } else {
+        const favorites: Favorites[] = localStorage.getItem('favoriteItems')
+          ? JSON.parse(localStorage.getItem('favoriteItems')) : []
+        const result = results.find(el => el.id == favorite.dataset.id);
+        favorites.push({ id: result.id, name: result.name, img: result.img });
+        localStorage.setItem('favoriteItems', JSON.stringify(favorites));
+        localStorage.setItem('favoritesAmount', `${+localStorage.getItem('favoritesAmount') + 1}`)
+      }
+      favorite.classList.toggle("active");
+      updateBlock(".favoritesCount", `${getFavoritesAmount()}`);
+      console.log(`Проверка localStorage на наличие избранных элементов: `, localStorage.getItem("favoriteItems"));
+      console.log(`Проверка localStorage на кол-во избранных элементов: `, localStorage.getItem("favoritesAmount"));
+    })
+  })
+}
+export function renderSearchStubBlock(): void {
   renderBlock(
     'search-results-block',
     `
@@ -12,77 +67,40 @@ export function renderSearchStubBlock () {
   )
 }
 
-export function renderEmptyOrErrorSearchBlock (reasonMessage) {
+export function renderEmptyOrErrorSearchBlock(reasonMessage: string) {
   renderBlock(
     'search-results-block',
     `
     <div class="no-results-block">
-      <img src="img/no-results.png" />
+      <img src="../img/no-results.png" />
       <p>${reasonMessage}</p>
     </div>
     `
   )
 }
 
-export function renderSearchResultsBlock () {
+export function renderSearchResultsBlock(results: Estates[]): void {
   renderBlock(
     'search-results-block',
     `
     <div class="search-results-header">
-        <p>Результаты поиска</p>
-        <div class="search-results-filter">
-            <span><i class="icon icon-filter"></i> Сортировать:</span>
-            <select>
-                <option selected="">Сначала дешёвые</option>
-                <option selected="">Сначала дорогие</option>
-                <option>Сначала ближе</option>
-            </select>
-        </div>
+      <p>Результаты поиска</p>
+      <div class="search-results-filter">
+          <span><i class="icon icon-filter"></i> Сортировать:</span>
+          <select>
+              <option selected="">Сначала дешёвые</option>
+              <option selected="">Сначала дорогие</option>
+              <option>Сначала ближе</option>
+          </select>
+      </div>
     </div>
-    <ul class="results-list">
-      <li class="result">
-        <div class="result-container">
-          <div class="result-img-container">
-            <div class="favorites active"></div>
-            <img class="result-img" src="./img/result-1.png" alt="">
-          </div>	
-          <div class="result-info">
-            <div class="result-info--header">
-              <p>YARD Residence Apart-hotel</p>
-              <p class="price">13000&#8381;</p>
-            </div>
-            <div class="result-info--map"><i class="map-icon"></i> 2.5км от вас</div>
-            <div class="result-info--descr">Комфортный апарт-отель в самом сердце Санкт-Петербрга. К услугам гостей номера с видом на город и бесплатный Wi-Fi.</div>
-            <div class="result-info--footer">
-              <div>
-                <button>Забронировать</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="result">
-        <div class="result-container">
-          <div class="result-img-container">
-            <div class="favorites"></div>
-            <img class="result-img" src="./img/result-2.png" alt="">
-          </div>	
-          <div class="result-info">
-            <div class="result-info--header">
-              <p>Akyan St.Petersburg</p>
-              <p class="price">13000&#8381;</p>
-            </div>
-            <div class="result-info--map"><i class="map-icon"></i> 1.1км от вас</div>
-            <div class="result-info--descr">Отель Akyan St-Petersburg с бесплатным Wi-Fi на всей территории расположен в историческом здании Санкт-Петербурга.</div>
-            <div class="result-info--footer">
-              <div>
-                <button>Забронировать</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
+    <ul class="results-list" id="results-list">
     </ul>
     `
   )
+  renderBlock("results-list", getResultsToRender(results));
+  localStorage.setItem('favoriteItems', '');
+  const favoritesElems: NodeListOf<HTMLDivElement> = document.querySelectorAll(".favorites");
+  FavoriteHandler(favoritesElems, results);
 }
+

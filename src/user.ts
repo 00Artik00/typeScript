@@ -1,6 +1,6 @@
 import { renderBlock } from './lib.js'
 
-export function renderUserBlock(favoriteItemsAmount: number, userName: string, userAvatarLink: string) {
+export function renderUserBlock(favoriteItemsAmount: number, userName?: string, userAvatarLink?: string): void {
   const favoritesCaption = favoriteItemsAmount ? favoriteItemsAmount : 'ничего нет';
   const hasFavoriteItems = favoriteItemsAmount ? true : false;
   getUserData();
@@ -14,26 +14,26 @@ export function renderUserBlock(favoriteItemsAmount: number, userName: string, u
       <div class="info">
           <p class="name">${userName}</p>
           <p class="fav">
-            <i class="heart-icon${hasFavoriteItems ? ' active' : ''}"></i>${favoritesCaption}
+            <i class="heart-icon${hasFavoriteItems ? ' active' : ''}"></i>
+            <span class="favoritesCount">${favoritesCaption}</span>
           </p>
       </div>
     </div>
     `
   )
 }
-function getUserData(): unknown {
+export function getUserData(): unknown {
   if (localStorage.getItem('user') == null) {
-    return "ничего не найдено"
+    return 0
   } else {
     return JSON.parse(localStorage.getItem('user'))
   }
-
 }
-function getFavoritesAmount(): unknown {
+export function getFavoritesAmount(): number {
   if (localStorage.getItem('favoritesAmount') == null) {
-    return "ничего не найдено";
+    return 0;
   } else {
     return +localStorage.getItem('favoritesAmount');
   }
-
 }
+
