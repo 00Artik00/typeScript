@@ -4,9 +4,11 @@ import { renderUserBlock, getFavoritesAmount } from './user.js'
 import { renderToast } from './lib.js'
 import { initHandlers } from './initHandlers.js'
 
+
 window.addEventListener('DOMContentLoaded', () => {
   localStorage.setItem('user', JSON.stringify({ username: "Artem", avatarUrl: "/img/avatar.png" }));
   localStorage.setItem('favoritesAmount', `${getFavoritesAmount()}`);
+  localStorage.removeItem('flat-rent-db');
 
   const date = new Date();
   const dateIn: string = date.toISOString().split("T")[0];
