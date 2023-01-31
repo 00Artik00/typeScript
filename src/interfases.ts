@@ -20,6 +20,7 @@ export interface Estates {
     name: string,
     price: number,
     distanse: string,
+    distanseNumber: number,
     describe: string,
     id: string
 }

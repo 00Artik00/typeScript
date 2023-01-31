@@ -2,7 +2,7 @@ import { renderBlock } from './lib.js'
 import { SearchFormData, Estates } from './interfases.js'
 import { renderEmptyOrErrorSearchBlock, renderSearchResultsBlock } from './search-results.js'
 import { Database, FlatRentSdk } from './flat-rent-sdk.js'
-import { resolve } from 'path'
+
 
 function searchCallBack(search: Error | []): void {
   setTimeout(() => {
@@ -27,6 +27,7 @@ async function GetResultsFromAllProvider(formData: SearchFormData) {
   const provider1 = await search<SearchFormData>(formData);
   const provider2 = await Provider2Search(formData);
   const provider2Changed: Estates[] = provider2.map(el => {
+    const randomDistanse = Math.floor(Math.random() * 10 + 1);
     return {
       img: el.photos[0],
       imgAlt: "estate",
@@ -34,7 +35,8 @@ async function GetResultsFromAllProvider(formData: SearchFormData) {
       city: "Санкт-Петербург",
       name: el.title,
       price: el.totalPrice,
-      distanse: " 2.5км от вас",
+      distanse: ` ${randomDistanse}км от вас`,
+      distanseNumber: randomDistanse,
       describe: el.details,
       id: el.id
     }
@@ -60,12 +62,11 @@ export function renderSearchFormBlock(dateIn: string, dateOut: string): void {
             <input type="hidden" disabled value="59.9386,30.3141" />
           </div>
           <div>
-          <input class="inputProvider" name="providers" list="providers" placeholder="choose provider"/>
-            <datalist id="providers">
-              <option value="Provider1"/>
-              <option value="Provider2"/>
-              <option value="All"/>
-            </datalist>
+          <select class="selectProvider">
+            <option>Provider1</option>
+            <option>Provider2</option>
+            <option>All</option>
+          </select>
         </div>
           <!--<div class="providers">
             <label><input type="checkbox" name="provider" value="homy" checked /> Homy</label>
@@ -97,7 +98,7 @@ export function renderSearchFormBlock(dateIn: string, dateOut: string): void {
 }
 export function searchHandler(event: Event): void {
   event.preventDefault();
-  const inputProvider: string = (<HTMLInputElement>document.querySelector(".inputProvider")).value
+  const inputProvider: string = (<HTMLSelectElement>document.querySelector(".selectProvider")).value
   const formData: SearchFormData = {
     inputCity: (<HTMLInputElement>document.querySelector("#city")).value,
     inputIn: (<HTMLInputElement>document.querySelector("#check-in-date")).value,
@@ -107,7 +108,9 @@ export function searchHandler(event: Event): void {
   if (inputProvider == "Provider1") {
     search<SearchFormData>(formData, searchCallBack).then(results => {
       if (results.length > 0) {
+        results.sort((first, second) => first.price - second.price)
         renderSearchResultsBlock(results)
+        localStorage.setItem('results', JSON.stringify(results));
       } else {
         renderEmptyOrErrorSearchBlock(`По вашим запросам ничего не найдено, попробуйте изменить дату заезда/выезда или максимальную цену за сутки`);
       }
@@ -120,6 +123,7 @@ export function searchHandler(event: Event): void {
       if (data.length > 0) {
         const newResults = [];
         data.forEach(el => {
+          const randomDistanse = Math.floor(Math.random() * 10 + 1);
           newResults.push({
             img: el.photos[0],
             imgAlt: "estate",
@@ -127,12 +131,15 @@ export function searchHandler(event: Event): void {
             city: "Санкт-Петербург",
             name: el.title,
             price: el.totalPrice,
-            distanse: " 2.5км от вас",
+            distanse: ` ${randomDistanse}км от вас`,
+            distanseNumber: randomDistanse,
             describe: el.details,
             id: el.id
           })
         })
+        newResults.sort((first, second) => first.price - second.price);
         renderSearchResultsBlock(newResults)
+        localStorage.setItem('results', JSON.stringify(newResults));
       } else {
         renderEmptyOrErrorSearchBlock(`По вашим запросам ничего не найдено, попробуйте изменить дату заезда/выезда или максимальную цену за сутки`);
       }
@@ -142,7 +149,9 @@ export function searchHandler(event: Event): void {
   if (inputProvider == "All") {
     GetResultsFromAllProvider(formData).then(results => {
       if (results.length > 0) {
+        results.sort((first, second) => first.price - second.price)
         renderSearchResultsBlock(results)
+        localStorage.setItem('results', JSON.stringify(results));
       } else {
         renderEmptyOrErrorSearchBlock(`По вашим запросам ничего не найдено, попробуйте изменить дату заезда/выезда или максимальную цену за сутки`);
       }

@@ -55,6 +55,28 @@ function FavoriteHandler(favoritesElems: NodeListOf<HTMLDivElement>, results: Es
     })
   })
 }
+function filterHandler(filterElem: HTMLSelectElement) {
+  filterElem.addEventListener('change', (event) => {
+    event.preventDefault();
+    const filterName = filterElem.value;
+    if (filterName == "Сначала дешёвые") {
+      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
+      results.sort((first, second) => first.price - second.price)
+      updateBlock(".results-list", getResultsToRender(results));
+    }
+    if (filterName == "Сначала дорогие") {
+      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
+      results.sort((first, second) => second.price - first.price)
+      updateBlock(".results-list", getResultsToRender(results));
+    }
+    if (filterName == "Сначала ближе") {
+      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
+      results.sort((first, second) => first.distanseNumber - second.distanseNumber);
+      updateBlock(".results-list", getResultsToRender(results));
+    }
+  })
+}
+
 export function renderSearchStubBlock(): void {
   renderBlock(
     'search-results-block',
@@ -87,9 +109,9 @@ export function renderSearchResultsBlock(results: Estates[]): void {
       <p>Результаты поиска</p>
       <div class="search-results-filter">
           <span><i class="icon icon-filter"></i> Сортировать:</span>
-          <select>
-              <option selected="">Сначала дешёвые</option>
-              <option selected="">Сначала дорогие</option>
+          <select class="filter">
+              <option>Сначала дешёвые</option>
+              <option>Сначала дорогие</option>
               <option>Сначала ближе</option>
           </select>
       </div>
@@ -102,5 +124,7 @@ export function renderSearchResultsBlock(results: Estates[]): void {
   localStorage.setItem('favoriteItems', '');
   const favoritesElems: NodeListOf<HTMLDivElement> = document.querySelectorAll(".favorites");
   FavoriteHandler(favoritesElems, results);
+  const filterElem: HTMLSelectElement = document.querySelector('.filter');
+  filterHandler(filterElem);
 }
 
