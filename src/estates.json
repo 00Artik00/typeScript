@@ -1,0 +1,26 @@
+[
+    {
+        "img": "../img/estates/es1.png",
+        "imgAlt": "estate1",
+        "free": true,
+        "city": "Санкт-Петербург",
+        "name": "YARD Residence Apart-hotel",
+        "price": 20000,
+        "distanse": " 2.5км от вас",
+        "distanseNumber": 2.5,
+        "describe": "Комфортный апарт-отель в самом сердце Санкт-Петербрга. К услугам гостей номера с видом на город и бесплатный Wi-Fi.",
+        "id": "1"
+    },
+    {
+        "img": "../img/estates/es2.png",
+        "imgAlt": "estate2",
+        "free": true,
+        "city": "Санкт-Петербург",
+        "name": "Akyan St.Petersburg",
+        "price": 13000,
+        "distanse": " 1.1км от вас",
+        "distanseNumber": 1.1,
+        "describe": "Отель Akyan St-Petersburg с бесплатным Wi-Fi на всей территории расположен в историческом здании Санкт-Петербурга.",
+        "id": "2"
+    }
+]
