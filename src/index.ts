@@ -11,9 +11,10 @@ window.addEventListener('DOMContentLoaded', () => {
   localStorage.removeItem('flat-rent-db');
 
   const date = new Date();
-  const dateIn: string = date.toISOString().split("T")[0];
+  const dateIn: string = date.toISOString().split("T")[0] || '';
   const dateOut: string = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 3, 0)
-    .toISOString().split('T')[0];
+    .toISOString().split('T')[0] || '';
+
   renderUserBlock(getFavoritesAmount(), 'Tim Berton', '/img/avatar.png')
   renderSearchFormBlock(dateIn, dateOut)
   renderSearchStubBlock()

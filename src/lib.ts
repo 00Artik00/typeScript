@@ -1,9 +1,11 @@
 import { Message, Action } from "./interfases"
 export function renderBlock(elementId: string, html: string): void {
   const element = document.getElementById(elementId)
-  element.innerHTML = html
+  if (element != null) {
+    element.innerHTML = html
+  }
 }
-export function renderToast(message: Message, action: Action): void {
+export function renderToast(message: Message | null, action: Action | null): void {
   let messageText = ''
 
   if (message != null) {
@@ -20,7 +22,7 @@ export function renderToast(message: Message, action: Action): void {
     messageText
   )
 
-  const button: HTMLButtonElement = document.querySelector('#toast-main-action')
+  const button: HTMLButtonElement | null = document.querySelector('#toast-main-action')
   if (button != null) {
     button.onclick = function () {
       if (action != null && action.handler != null) {
@@ -32,5 +34,7 @@ export function renderToast(message: Message, action: Action): void {
 }
 export function updateBlock(querySelec: string, text: string): void {
   const element = document.querySelector(querySelec)
-  element.innerHTML = text
+  if (element != null) {
+    element.innerHTML = text;
+  }
 }

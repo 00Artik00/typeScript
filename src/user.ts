@@ -26,14 +26,14 @@ export function getUserData(): unknown {
   if (localStorage.getItem('user') == null) {
     return 0
   } else {
-    return JSON.parse(localStorage.getItem('user'))
+    return JSON.parse(localStorage.getItem('user') || "")
   }
 }
 export function getFavoritesAmount(): number {
-  if (localStorage.getItem('favoritesAmount') == null) {
+  const favoriteAmount = localStorage.getItem('favoritesAmount');
+  if (favoriteAmount == null) {
     return 0;
-  } else {
-    return +localStorage.getItem('favoritesAmount');
   }
+  return +favoriteAmount;
 }
 

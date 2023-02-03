@@ -35,18 +35,25 @@ function FavoriteHandler(favoritesElems: NodeListOf<HTMLDivElement>, results: Es
     favorite.addEventListener('click', (event) => {
       //Обработчик для отмены избранного
       if (favorite.classList.contains('active')) {
-        const favorites: Favorites[] = JSON.parse(localStorage.getItem('favoriteItems'));
-        favorites.splice(favorites.indexOf(favorites.find(el => el.id == favorite.dataset.id)), 1);
-        localStorage.setItem('favoriteItems', JSON.stringify(favorites))
-        localStorage.setItem('favoritesAmount', `${+localStorage.getItem('favoritesAmount') - 1}`)
+        const favorites: Favorites[] = JSON.parse(localStorage.getItem('favoriteItems') || "");
+        const favoritesElement = favorites.find(el => el.id == favorite.dataset["id"]);
+        if (favoritesElement != undefined) {
+          favorites.splice(favorites.indexOf(favoritesElement), 1);
+          localStorage.setItem('favoriteItems', JSON.stringify(favorites));
+          localStorage.setItem('favoritesAmount', `${favorites.length}`);
+        }
+
         //Обработчик для добавления избранного
       } else {
         const favorites: Favorites[] = localStorage.getItem('favoriteItems')
-          ? JSON.parse(localStorage.getItem('favoriteItems')) : []
-        const result = results.find(el => el.id == favorite.dataset.id);
-        favorites.push({ id: result.id, name: result.name, img: result.img });
-        localStorage.setItem('favoriteItems', JSON.stringify(favorites));
-        localStorage.setItem('favoritesAmount', `${+localStorage.getItem('favoritesAmount') + 1}`)
+          ? JSON.parse(localStorage.getItem('favoriteItems') || "") : []
+
+        const result = results.find(el => el.id == favorite.dataset["id"]);
+        if (result != undefined) {
+          favorites.push({ id: result.id, name: result.name, img: result.img });
+          localStorage.setItem('favoriteItems', JSON.stringify(favorites));
+          localStorage.setItem('favoritesAmount', `${favorites.length}`)
+        }
       }
       favorite.classList.toggle("active");
       updateBlock(".favoritesCount", `${getFavoritesAmount()}`);
@@ -55,26 +62,28 @@ function FavoriteHandler(favoritesElems: NodeListOf<HTMLDivElement>, results: Es
     })
   })
 }
-function filterHandler(filterElem: HTMLSelectElement) {
-  filterElem.addEventListener('change', (event) => {
-    event.preventDefault();
-    const filterName = filterElem.value;
-    if (filterName == "Сначала дешёвые") {
-      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
-      results.sort((first, second) => first.price - second.price)
-      updateBlock(".results-list", getResultsToRender(results));
-    }
-    if (filterName == "Сначала дорогие") {
-      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
-      results.sort((first, second) => second.price - first.price)
-      updateBlock(".results-list", getResultsToRender(results));
-    }
-    if (filterName == "Сначала ближе") {
-      const results: Estates[] = JSON.parse(localStorage.getItem('results'));
-      results.sort((first, second) => first.distanseNumber - second.distanseNumber);
-      updateBlock(".results-list", getResultsToRender(results));
-    }
-  })
+function filterHandler(filterElem: HTMLSelectElement | null) {
+  if (filterElem != null) {
+    filterElem.addEventListener('change', (event) => {
+      event.preventDefault();
+      const filterName = filterElem.value;
+      if (filterName == "Сначала дешёвые") {
+        const results: Estates[] = JSON.parse(localStorage.getItem('results') || "");
+        results.sort((first, second) => first.price - second.price)
+        updateBlock(".results-list", getResultsToRender(results));
+      }
+      if (filterName == "Сначала дорогие") {
+        const results: Estates[] = JSON.parse(localStorage.getItem('results') || "");
+        results.sort((first, second) => second.price - first.price)
+        updateBlock(".results-list", getResultsToRender(results));
+      }
+      if (filterName == "Сначала ближе") {
+        const results: Estates[] = JSON.parse(localStorage.getItem('results') || "");
+        results.sort((first, second) => first.distanseNumber - second.distanseNumber);
+        updateBlock(".results-list", getResultsToRender(results));
+      }
+    })
+  }
 }
 
 export function renderSearchStubBlock(): void {
@@ -124,7 +133,7 @@ export function renderSearchResultsBlock(results: Estates[]): void {
   localStorage.setItem('favoriteItems', '');
   const favoritesElems: NodeListOf<HTMLDivElement> = document.querySelectorAll(".favorites");
   FavoriteHandler(favoritesElems, results);
-  const filterElem: HTMLSelectElement = document.querySelector('.filter');
+  const filterElem: HTMLSelectElement | null = document.querySelector('.filter');
   filterHandler(filterElem);
 }
 

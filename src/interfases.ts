@@ -21,7 +21,7 @@ export interface Estates {
     price: number,
     distanse: string,
     distanseNumber: number,
-    describe: string,
+    describe: string | undefined,
     id: string
 }
 export interface Favorites {

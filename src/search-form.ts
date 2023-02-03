@@ -34,7 +34,7 @@ async function GetResultsFromAllProvider(formData: SearchFormData) {
       free: true,
       city: "Санкт-Петербург",
       name: el.title,
-      price: el.totalPrice,
+      price: el.totalPrice || 0,
       distanse: ` ${randomDistanse}км от вас`,
       distanseNumber: randomDistanse,
       describe: el.details,
@@ -107,11 +107,16 @@ export function searchHandler(event: Event): void {
   }
   if (inputProvider == "Provider1") {
     search<SearchFormData>(formData, searchCallBack).then(results => {
-      if (results.length > 0) {
+      if (results.length == 1) {
+        renderSearchResultsBlock(results)
+        localStorage.setItem('results', JSON.stringify(results));
+      }
+      if (results.length > 1) {
         results.sort((first, second) => first.price - second.price)
         renderSearchResultsBlock(results)
         localStorage.setItem('results', JSON.stringify(results));
-      } else {
+      }
+      if (!results.length) {
         renderEmptyOrErrorSearchBlock(`По вашим запросам ничего не найдено, попробуйте изменить дату заезда/выезда или максимальную цену за сутки`);
       }
     })
@@ -121,7 +126,7 @@ export function searchHandler(event: Event): void {
     const resultsPromise = Provider2Search(formData)
     resultsPromise.then(data => {
       if (data.length > 0) {
-        const newResults = [];
+        const newResults: Estates[] = [];
         data.forEach(el => {
           const randomDistanse = Math.floor(Math.random() * 10 + 1);
           newResults.push({
@@ -130,7 +135,7 @@ export function searchHandler(event: Event): void {
             free: true,
             city: "Санкт-Петербург",
             name: el.title,
-            price: el.totalPrice,
+            price: el.totalPrice || 0,
             distanse: ` ${randomDistanse}км от вас`,
             distanseNumber: randomDistanse,
             describe: el.details,
@@ -179,13 +184,17 @@ export async function search<Type>(formData: Type, cl?: (search: Error | []) => 
     },
   });
   if (response.ok) {
-    let results: Estates[] = await response.json();
-    if (results.length > 0) {
-      return results
+    let results: Estates[] = []
+    const estates: Estates[] = await response.json();
+    if (estates.length > 0) {
+      results = estates
     }
-    return []
+    return results
+
   } else {
+    const emptyArr: Estates[] = [];
     alert("Ошибка HTTP: " + response.status);
+    return emptyArr
   }
 }
 
